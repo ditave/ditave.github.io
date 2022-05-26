@@ -18,7 +18,7 @@
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
   
-  <title>防火墙实验 - Hexo</title>
+  <title>无线网络安全实验 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
@@ -163,7 +163,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="防火墙实验">
+            <span class="h2" id="subtitle" title="无线网络安全实验">
               
             </span>
 
@@ -173,8 +173,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-04-26 00:00" pubdate>
-        2022年4月26日 凌晨
+      <time datetime="2022-05-26 22:42" pubdate>
+        2022年5月26日 晚上
       </time>
     </span>
   
@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      874 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      12
+      10
        分钟
     </span>
   
@@ -225,83 +225,60 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">防火墙实验</h1>
+            <h1 style="display: none">无线网络安全实验</h1>
             
             <div class="markdown-body">
-              <h1 id="防火墙实验"><a href="#防火墙实验" class="headerlink" title="防火墙实验"></a>防火墙实验</h1><h3 id="一、实验目的"><a href="#一、实验目的" class="headerlink" title="一、实验目的"></a>一、实验目的</h3><ol>
-<li>基于Linux虚拟机，安装、配置pfSense<br>a) 设置单层防火墙，限制外部主机访问localhost的全部端口；<br>b) 有条件的情况下，配置双层防火墙模式（一个虚拟机配置mysql，一个作为web服务器，在两者之间尝试设置一个防火墙）；</li>
-<li>安装Snort，与pfSense配合成为IDS工作模式。</li>
-</ol>
-<h3 id="二、实验准备"><a href="#二、实验准备" class="headerlink" title="二、实验准备"></a>二、实验准备</h3><p>首先设计根据实验要求，设计网络拓扑图：</p>
-<p>外部主机：系统为kali，IP地址为<strong>10.0.2.10</strong>，作为模拟外网主机。</p>
-<p>DMZ主机：系统为Debian11，IP地址为<strong>192.168.116.13</strong>，作为web服务器，可被外部访问。</p>
-<p>内部主机：系统为Debian11，IP地址为<strong>192.168.120.13</strong>，作为mysql数据库，仅能被web服务器访问。</p>
-<p>外部防火墙：系统为pfSense，IP地址如下：    </p>
+              <h1 id="无线网络安全实验"><a href="#无线网络安全实验" class="headerlink" title="无线网络安全实验"></a>无线网络安全实验</h1><h2 id="一、实验内容"><a href="#一、实验内容" class="headerlink" title="一、实验内容"></a>一、实验内容</h2><p>利用<code>aircrack-ng</code>工具集进行WPA2破解。</p>
+<h2 id="二、实验环境"><a href="#二、实验环境" class="headerlink" title="二、实验环境"></a>二、实验环境</h2><p><code>手机热点</code>，模拟被攻击的WiFi路由。</p>
+<p><code>ubuntu 18.04 物理机</code>，负责攻击破解WiFi。</p>
+<p><code>Windows10 </code>物理机，用于模拟一般情况下机器连接被攻击的WiFi</p>
+<h2 id="三、连接网卡"><a href="#三、连接网卡" class="headerlink" title="三、连接网卡"></a>三、连接网卡</h2><p>此实验需要一个支持<code>monitor 监听模式</code>的无线网卡，可到<code>aircrack-ng</code>官网下查询支持的网卡型号。最好使用免驱动的USB网卡，因为虚拟机无法直接使用物理机的内置无线网卡。</p>
+<p>由于我使用的是物理机，可以直接使用内置的无线网卡。</p>
+<h2 id="四、实验过程"><a href="#四、实验过程" class="headerlink" title="四、实验过程"></a>四、实验过程</h2><h3 id="1-检查网卡是否支持监听"><a href="#1-检查网卡是否支持监听" class="headerlink" title="1.检查网卡是否支持监听"></a>1.检查网卡是否支持监听</h3><p>使用命令查看是否有支持的网卡：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo airmon-ng<br></code></pre></td></tr></table></figure>
+
+<p>如图所示，可以看到当前电脑上的无线网卡<code>wlp1s0</code>是支持监听模式的，如果没有输出则说明不支持。</p>
+<p><img src="2.png" srcset="/img/loading.gif" lazyload alt="2"></p>
+<h3 id="2-打开网卡的监听模式"><a href="#2-打开网卡的监听模式" class="headerlink" title="2.打开网卡的监听模式"></a>2.打开网卡的监听模式</h3><p>使用命令开启监听模式：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo airmon-ng start wlp1s0<br></code></pre></td></tr></table></figure>
+
+<p><img src="3.png" srcset="/img/loading.gif" lazyload alt="3"></p>
+<p>此时用<code>ifconfig</code>命令查看，发现网卡名称变成了<code>wlp1s0mon</code>：</p>
+<p><img src="4.png" srcset="/img/loading.gif" lazyload alt="2"></p>
+<h3 id="3-扫描附近WiFi"><a href="#3-扫描附近WiFi" class="headerlink" title="3.扫描附近WiFi"></a>3.扫描附近WiFi</h3><p>使用命令，扫描网卡附近的WiFi信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo airodump-ng wlp1s0mon<br></code></pre></td></tr></table></figure>
+
+<p>得到结果如图所示，命令输出分为两个部分。上面显示了扫描到的WiFi详细信息：</p>
 <ul>
-<li>WAN口：<strong>10.0.2.4</strong></li>
-<li>LAN口：<strong>192.168.116.20</strong>。</li>
+<li><code>BSSID</code>表示WiF路由的MAC地址。</li>
+<li><code>PWR</code>表示信号的强度，数值越大代表信息越强。</li>
+<li><code>CH </code>表示WiFi使用的信道。</li>
+<li><code>ENC</code>表示使用的加密的方式，常见的加密方式有<code>WPA</code> 、<code>WPA2</code>、<code>WPA/WPA2</code>、<code>WEP</code>。</li>
+<li><code>ESSID</code>表示WIFI的名称。</li>
 </ul>
-<p>内部防火墙：系统为pfSense，IP地址如下：</p>
-<ul>
-<li>WAN口：<strong>192.168.116.30</strong></li>
-<li>LAN口：<strong>192.168.120.20</strong>。</li>
-</ul>
-<p>具体如图所示：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a10"></p>
-<h3 id="三、实验过程"><a href="#三、实验过程" class="headerlink" title="三、实验过程"></a>三、实验过程</h3><h4 id="1-基于Linux虚拟机，安装、配置pfSense"><a href="#1-基于Linux虚拟机，安装、配置pfSense" class="headerlink" title="1.基于Linux虚拟机，安装、配置pfSense"></a>1.基于Linux虚拟机，安装、配置pfSense</h4><h5 id="1-1-设置单层防火墙，限制外部主机访问localhost的全部端口"><a href="#1-1-设置单层防火墙，限制外部主机访问localhost的全部端口" class="headerlink" title="1.1 设置单层防火墙，限制外部主机访问localhost的全部端口"></a>1.1 设置单层防火墙，限制外部主机访问localhost的全部端口</h5><p>根据教程，安装pfSense，并配置<strong>WAN</strong>和<strong>LAN</strong>的IP地址。IP地址如下：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a1"></p>
-<p>当前pfSense的WAN口设置为：允许外部主机访问<strong>WAN</strong>，如图所示：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a3"></p>
-<p>在<strong>kali</strong>下使用<strong>namp</strong>工具扫描当前开放端口，结果如图所示：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a2"></p>
-<p>在kali下，能成功ping通pfSense或通过SSH远程连接到pfSense：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a4"></p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a5"></p>
-<p>修改pfSense的<strong>WAN口</strong>的策略规则，<strong>拒绝</strong>所有访问<strong>WAN口</strong>的外部主机：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a6"></p>
-<p>再次尝试用kali访问：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a7"></p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="1a8"></p>
-<p>如图所示，kali无法ping通pfSense，无法访问pfSense的22端口。</p>
-<h5 id="1-2-配置双层防火墙模式（一个虚拟机配置mysql，一个作为web服务器，在两者之间尝试设置一个防火墙）"><a href="#1-2-配置双层防火墙模式（一个虚拟机配置mysql，一个作为web服务器，在两者之间尝试设置一个防火墙）" class="headerlink" title="1.2 配置双层防火墙模式（一个虚拟机配置mysql，一个作为web服务器，在两者之间尝试设置一个防火墙）"></a>1.2 配置双层防火墙模式（一个虚拟机配置mysql，一个作为web服务器，在两者之间尝试设置一个防火墙）</h5><p>设置防火墙的规则策略前，对网络的连通性进行测试。</p>
-<p><strong>外网主机kali</strong> 成功ping通DMZ的<strong>web服务器</strong>和内网的<strong>mysql</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a2"></p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a2"></p>
-<p>简单编写一个php文件，让<strong>web服务器</strong>连接内网的<strong>mysql</strong>：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$dbhost</span> = <span class="hljs-string">&#x27;192.168.120.13&#x27;</span>;  <span class="hljs-comment">// mysql服务器主机地址</span><br><span class="hljs-variable">$dbuser</span> = <span class="hljs-string">&#x27;webserver&#x27;</span>;            <span class="hljs-comment">// mysql用户名</span><br><span class="hljs-variable">$dbpass</span> = <span class="hljs-string">&#x27;123456&#x27;</span>;          <span class="hljs-comment">// mysql用户名密码</span><br><span class="hljs-variable">$conn</span> = mysqli_connect(<span class="hljs-variable">$dbhost</span>, <span class="hljs-variable">$dbuser</span>, <span class="hljs-variable">$dbpass</span>);<br><span class="hljs-keyword">if</span> (!<span class="hljs-variable">$conn</span>) &#123;<br>    <span class="hljs-comment">//die(&#x27;Could not connect: &#x27; . mysqli_error());</span><br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&#x27;could not connect&#x27;</span>;<br>&#125;<br><span class="hljs-keyword">else</span><br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&#x27;数据库连接成功！&#x27;</span>;<br>mysqli_close(<span class="hljs-variable">$conn</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>下面部分则显示了与上面WiFi相连的设备的相关信息。</p>
+<p><img src="5.png" srcset="/img/loading.gif" lazyload alt="2"></p>
+<p>本次实验要破解的WiFi名称为<code>yuki</code>，MAC地址为<code>52:DF:16:20:7A:44</code>，选择的信道为<code>10</code>，加密方式为<code>WPA2</code>。</p>
+<h3 id="4-抓取握手包"><a href="#4-抓取握手包" class="headerlink" title="4.抓取握手包"></a>4.抓取握手包</h3><p>监听并抓取指定WiFi发送的握手包，命令如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sh">sudo airodump-ng --ivs --bssid FC:D7:33:3F:BC:F8 –w longas -c 11 wlp1s0mon<br><br><span class="hljs-comment"># --ivs 表示只抓取可用于破解的IVS数据报文</span><br><span class="hljs-comment"># --bssid 被攻击的路由的MAC地址</span><br><span class="hljs-comment"># -w 保存的文件名</span><br><span class="hljs-comment"># -c 被攻击的路由的信道</span><br></code></pre></td></tr></table></figure>
 
+<p>结果如图所示，此时会不断显示被攻击的WiFi路由相关信息 ，当有人连接该WiFi时就会自动抓包。</p>
+<p>当然如果没有人连接，我们可以使用冲突模式攻击，强制使合法客户端断连，使其重连。使用该方法时，最好选择一个较为活跃的主机。</p>
+<p><img src="6.png" srcset="/img/loading.gif" lazyload alt="6"></p>
+<p>此处我们使用冲突模式攻击，被攻击的客户端MAC地址为<code>EE:80:F4:9F:75:E9</code>，使用如下命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sh">sudo aireplay-ng -0 5 –a 52:DF:16:20:7A:44 -c EE:80:F4:9F:75:E9 wlp1s0mon<br><br><span class="hljs-comment"># -0 是发包数量</span><br><span class="hljs-comment"># -a 是WiFi路由的MAC地址</span><br><span class="hljs-comment"># -c 是被攻击的客户端的MAC地址</span><br></code></pre></td></tr></table></figure>
 
+<p><img src="7.png" srcset="/img/loading.gif" lazyload alt="7"></p>
+<p>抓包成功后，会在右上角显示<code>WPA handshake:[WiFi路由的MAC地址]</code>：</p>
+<p><img src="8.png" srcset="/img/loading.gif" lazyload alt="8"></p>
+<p>在文件夹中也能看到对应文件：<br><img src="9.png" srcset="/img/loading.gif" lazyload alt="9"></p>
+<h3 id="5-对抓到的包进行破解"><a href="#5-对抓到的包进行破解" class="headerlink" title="5.对抓到的包进行破解"></a>5.对抓到的包进行破解</h3><p>开始前，准备好用于破解的<code>密码字典</code>，可以在网上找已有的WiFi字典或自己生成。</p>
+<p>然后用<code>aircrack-ng</code>工具进行破解：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sh"><span class="hljs-comment"># aircrack-ng -w [字典路径] [要破解的包路径]</span><br><br>sudo aircrack-ng -w wpa-dictonary/common.txt yuki-01.ivs<br></code></pre></td></tr></table></figure>
 
-<p>配置<strong>外部防火墙</strong>的规则策略，首先配置WAN口，只<strong>允许外部主机使用TCP、UDP和ICMP协议访问web服务器</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a6"></p>
-<p>配置LAN口，允许DMZ内的主机能相互访问：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a7"></p>
-<p>配置<strong>内部防火墙</strong>的规则策略，首先配置WAN口：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a8"></p>
-<p>配置LAN口：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a9"></p>
-<p>然后测试防火墙的规则策略是否设置成功。</p>
-<p>首先用外部主机测试ping内网的mysql，无法ping通，说明<strong>外网无法访问内网</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a12"></p>
-<p>用内网的mysql测试ping外部主机，无法ping通，说明<strong>内网无法访问外网</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a13"></p>
-<p>用内网的mysql分别尝试ping外部防火墙的LAN口和web服务器，无法ping通LAN口，能ping通web服务器，说明<strong>内网主机只能向指定的DMZ主机发送数据</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a14"></p>
-<p>用外部主机访问web服务器，显示web服务器成功连接mysql，说明<strong>web服务器能访问内网的mysql</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a15"></p>
-<p>综上所述，成功配置了双层防火墙模式。</p>
-<h4 id="2-安装Snort，与pfSense配合成为IDS工作模式。"><a href="#2-安装Snort，与pfSense配合成为IDS工作模式。" class="headerlink" title="2. 安装Snort，与pfSense配合成为IDS工作模式。"></a>2. 安装Snort，与pfSense配合成为IDS工作模式。</h4><p>由于pfSense拥有较为丰富的插件，而Snort也在其中，因此选择本实验选择安装插件的方式安装Snort。</p>
-<p>在系统的插件管理中安装Snort插件，此处以提前安装完成：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="2a1"></p>
-<p>设计情景：编写一个snort规则，当它检测到你的电脑被其他的电脑通过ICMP协议访问，如ping命令，会发出一个警告。</p>
-<p>首先创建一个要被监控的接口，当前情景中是<strong>外部防火墙的WAN口</strong>：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="3a3"></p>
-<p>编写一条规则，当非DMZ网段和内网网段的主机向内网发送数据时，会警告并记录，具体规则如图所示：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="3a4"></p>
-<p>重启监控的接口，并尝试用外部主机ping内网的mysql(由于双层防火墙的限制，外部主机ping不通mysql)：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="3a2"></p>
-<p>查看Snort的log，有警告的记录：</p>
-<p><img src="images" srcset="/img/loading.gif" lazyload alt="3a1"><br>外部主机向内网发送数据被警告并记录，说明规则编写成功。</p>
+<p>使用命令后会显示破解的界面，破解成功会在中间显示<code>KEY FOUND! [WiFi密码]</code>：</p>
+<p><img src="10.png" srcset="/img/loading.gif" lazyload alt="10"></p>
+<p>如图所示，得到该WiFi的密码为<code>qazxsw123</code>。</p>
 
             </div>
             <hr>
@@ -312,7 +289,7 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/web/">web</a>
+                      <a class="hover-with-bg" href="/tags/%E6%97%A0%E7%BA%BF%E6%94%BB%E5%87%BB/">无线攻击</a>
                     
                   </div>
                 
@@ -329,18 +306,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/05/26/WiFi%E7%A0%B4%E8%A7%A3%E5%AE%9E%E9%AA%8C/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">无线网络安全实验</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2021/12/09/%E6%B5%8B%E8%AF%95/">
-                        <span class="hidden-mobile">测试</span>
+                      <a href="/2022/04/26/%E9%98%B2%E7%81%AB%E5%A2%99%E5%AE%9E%E9%AA%8C/">
+                        <span class="hidden-mobile">防火墙实验</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
